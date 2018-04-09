@@ -1,0 +1,77 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "firstname": {
+      "$id": "/properties/firstname",
+      "type": "string",
+      "title": "The Firstname Schema ",
+      "default": "",
+      "examples": [
+        "Mark"
+      ]
+    },
+    "lastname": {
+      "$id": "/properties/lastname",
+      "type": "string",
+      "title": "The Lastname Schema ",
+      "default": "",
+      "examples": [
+        "Smith"
+      ]
+    },
+    "totalprice": {
+      "$id": "/properties/totalprice",
+      "type": "integer",
+      "title": "The Totalprice Schema ",
+      "default": 0,
+      "examples": [
+        889
+      ]
+    },
+    "depositpaid": {
+      "$id": "/properties/depositpaid",
+      "type": "boolean",
+      "title": "The Depositpaid Schema ",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "bookingdates": {
+      "$id": "/properties/bookingdates",
+      "type": "object",
+      "properties": {
+        "checkin": {
+          "$id": "/properties/bookingdates/properties/checkin",
+          "type": "string",
+          "title": "The Checkin Schema ",
+          "default": "",
+          "examples": [
+            "2017-08-05"
+          ]
+        },
+        "checkout": {
+          "$id": "/properties/bookingdates/properties/checkout",
+          "type": "string",
+          "title": "The Checkout Schema ",
+          "default": "",
+          "examples": [
+            "2018-04-07"
+          ]
+        }
+      }
+    },
+    "additionalneeds": {
+      "$id": "/properties/additionalneeds",
+      "type": "string",
+      "title": "The Additionalneeds Schema ",
+      "default": "",
+      "examples": [
+        "Breakfast"
+      ]
+    }
+  }
+}
