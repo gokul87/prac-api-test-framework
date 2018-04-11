@@ -1,5 +1,7 @@
 package restAssured;
 
+import api.AuthApi;
+import api.BookingApi;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.codearte.jfairy.Fairy;
@@ -12,14 +14,9 @@ import io.restassured.response.Response;
 import io.restassured.specification.ResponseSpecification;
 import io.restassured.module.jsv.*;
 import org.testng.annotations.Test;
-
 import java.util.Random;
-
 import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.lessThan;
 import static org.testng.Assert.assertEquals;
-import restAssured.config.TestConfig;
 
 /**
  * This is a test class which gets executed against fake rest api data created by json-server
@@ -30,7 +27,7 @@ import restAssured.config.TestConfig;
  * @param <Posts>
  *
  */
-public class TestApi extends TestConfig {
+public class TestApi{
 
 //    public java.lang.Object uniqueNo;
     public int bookingId, dId;
@@ -38,6 +35,8 @@ public class TestApi extends TestConfig {
     public String token;
     ResponseSpecBuilder builder;
     static ResponseSpecification rspec;
+    public String baseurl = "http://localhost:3001/";
+
 
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ObjectNode pushContent = factory.objectNode();
@@ -63,7 +62,7 @@ public class TestApi extends TestConfig {
         Random rand = new Random();
         int x = rand.nextInt(5);
 
-        Response resp = given().get(baseurl+"booking");
+        Response resp = BookingApi.getBooking();
         assertEquals(resp.getStatusCode(), 200);
         String responseBody = resp.body().asString();
 
@@ -76,7 +75,7 @@ public class TestApi extends TestConfig {
     @Test(priority=3)
     public void testSingleApiBooking() {
 
-        Response resp = given().get(baseurl+"booking/"+bookingId);
+        Response resp = BookingApi.getSingleBooking(bookingId);
         assertEquals(resp.getStatusCode(), 200);
         assertEquals(resp.getContentType(), "application/json; charset=utf-8");
 
@@ -92,16 +91,8 @@ public class TestApi extends TestConfig {
                     " \"password\": \"password123\" \n" +
                     "}";
 
-        token = given().
-                contentType("application/json").
-                body(jsonString).
-                when().
-                post(baseurl + "auth").
-                then().
-                assertThat().
-                statusCode(200).
-                extract().
-                path("token");
+        Response resp = AuthApi.postAuth(jsonString);
+        token = resp.then().extract().path("token");
 
         System.out.println("The unique token for the posted data is "+ this.token);
     }
@@ -125,13 +116,7 @@ public class TestApi extends TestConfig {
         System.out.println("The token issssssss" + this.token);
         System.out.println("The value of booking Id issssss "+id);
 
-        Response resp = given().
-                                header("Content-Type", "application/json").
-                                header("Cookie","token="+this.token).
-                                body(pushContent).log().all().
-                        when().
-                                put(baseurl+"booking/"+id);
-
+        Response resp = BookingApi.updateBooking("application/json", "token="+this.token, pushContent, id);
         String responseBody = resp.body().asString();
 
         JsonPath jsonPath = new JsonPath(responseBody);
@@ -159,12 +144,7 @@ public class TestApi extends TestConfig {
 
         System.out.println("The json array looks like" + pushContent);
 
-        Response resp = given().
-                header("Content-Type", "application/json").
-                body(pushContent).log().all().
-                when().
-                post(baseurl+"booking");
-
+        Response resp = BookingApi.postBooking("application/json", pushContent);
         String responseBody = resp.body().asString();
 
         JsonPath jsonPath = new JsonPath(responseBody);
@@ -177,12 +157,7 @@ public class TestApi extends TestConfig {
     @Test(priority=6)
     public void testDeleteApi() {
 
-        given().
-                header("Cookie", "token="+this.token).
-        when().
-                delete(baseurl+"booking/"+Integer.toString(dId)).
-        then().
-                assertThat().
-                statusCode(201);
+        Response resp =BookingApi.deleteBooking("token="+this.token, Integer.toString(dId));
+        resp.then().statusCode(201);
     }
 }
