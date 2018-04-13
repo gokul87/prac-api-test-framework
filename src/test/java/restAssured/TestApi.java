@@ -7,12 +7,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.ResponseSpecification;
-import io.restassured.module.jsv.*;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.util.Random;
 import static io.restassured.RestAssured.*;
@@ -29,14 +28,12 @@ import static org.testng.Assert.assertEquals;
  */
 public class TestApi{
 
-//    public java.lang.Object uniqueNo;
     public int bookingId, dId;
     public String name;
     public String token;
-    ResponseSpecBuilder builder;
-    static ResponseSpecification rspec;
     public String baseurl = "http://localhost:3001/";
-
+    public static ResponseSpecBuilder builder;
+    public static ResponseSpecification responseSpec;
 
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ObjectNode pushContent = factory.objectNode();
@@ -44,7 +41,13 @@ public class TestApi{
 
     public TestApi() {
 
+    }
 
+    @BeforeClass
+    public void setUp(){
+        builder = new ResponseSpecBuilder();
+        builder.expectStatusCode(200);
+        responseSpec = builder.build();
     }
 
     @Test(priority=1)
@@ -63,7 +66,7 @@ public class TestApi{
         int x = rand.nextInt(5);
 
         Response resp = BookingApi.getBooking();
-        assertEquals(resp.getStatusCode(), 200);
+        resp.then().spec(responseSpec);
         String responseBody = resp.body().asString();
 
         JsonPath jsonPath = new JsonPath(responseBody);
@@ -117,12 +120,12 @@ public class TestApi{
         System.out.println("The value of booking Id issssss "+id);
 
         Response resp = BookingApi.updateBooking("application/json", "token="+this.token, pushContent, id);
+        resp.then().spec(responseSpec);
         String responseBody = resp.body().asString();
 
         JsonPath jsonPath = new JsonPath(responseBody);
         String fname = jsonPath.getString("firstname");
         assertEquals(fname, "tharu");
-        assertEquals(resp.getStatusCode(), 200);
     }
 
     @Test
@@ -145,19 +148,19 @@ public class TestApi{
         System.out.println("The json array looks like" + pushContent);
 
         Response resp = BookingApi.postBooking("application/json", pushContent);
+        resp.then().spec(responseSpec);
         String responseBody = resp.body().asString();
 
         JsonPath jsonPath = new JsonPath(responseBody);
         String fname = jsonPath.getString("booking.firstname");
         dId = jsonPath.getInt("bookingid");
         assertEquals(fname, name);
-        assertEquals(resp.getStatusCode(), 200);
     }
 
     @Test(priority=6)
     public void testDeleteApi() {
 
-        Response resp =BookingApi.deleteBooking("token="+this.token, Integer.toString(dId));
+        Response resp = BookingApi.deleteBooking("token="+this.token, Integer.toString(dId));
         resp.then().statusCode(201);
     }
 }
