@@ -8,7 +8,7 @@ public class AuthApi extends BaseApi {
 
     private static final String apiUrl = baseurl + "auth";
 
-    public static Response postAuth(String payload){
+    public static Response postAuth(Object payload){
                return given()
                      .contentType(ContentType.JSON)
                         .body(payload)

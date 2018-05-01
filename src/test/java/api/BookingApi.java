@@ -14,7 +14,7 @@ public class BookingApi extends BaseApi {
 
     public static Response getSingleBooking(int bookingId) {
 
-        return given().get(apiUrl+bookingId);
+        return given().log().all().get(apiUrl+bookingId);
     }
 
     public static Response updateBooking(String contentType, String cookieToken, Object content, String bookingId) {
